@@ -3,3 +3,7 @@
 ################################################################################
 
 /.vs/eLearningWebSite/v17
+/eLearningAutomotiveWebSite/obj/Debug/net6.0
+/eLearningAutomotiveWebSite/obj/Release/net6.0
+/eLearningAutomotiveWebSite/obj
+/.vs/eLearningAutomotiveWebSite/DesignTimeBuild
