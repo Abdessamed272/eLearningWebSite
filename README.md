@@ -20,3 +20,10 @@ il faudra impérativement :
 - un système de connexion
 
 Schéma fonctionnel:
+1) accueil des 'users'
+
+![image](https://user-images.githubusercontent.com/37933499/171361600-98d91332-2607-44c8-a8e5-22123ffff3e2.png)
+
+
+2) gestion des services
+
