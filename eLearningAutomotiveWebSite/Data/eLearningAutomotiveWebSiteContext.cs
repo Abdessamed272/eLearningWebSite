@@ -14,14 +14,14 @@ namespace eLearningAutomotiveWebSite.Data
         {
         }
 
-        public DbSet<eLearningAutomotiveWebSite.Models.Category>? Category { get; set; }
+        public DbSet<Category> Category { get; set; }
 
-        public DbSet<eLearningAutomotiveWebSite.Models.Content>? Content { get; set; }
+        public DbSet<Content> Content { get; set; }
 
-        public DbSet<eLearningAutomotiveWebSite.Models.History>? History { get; set; }
+        public DbSet<History> History { get; set; }
 
-        public DbSet<eLearningAutomotiveWebSite.Models.Role>? Role { get; set; }
+        public DbSet<Role> Role { get; set; }
 
-        public DbSet<eLearningAutomotiveWebSite.Models.User>? User { get; set; }
+        public DbSet<User> User { get; set; }
     }
 }
