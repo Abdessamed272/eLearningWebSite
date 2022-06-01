@@ -1,4 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using eLearningAutomotiveWebSite.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<eLearningAutomotiveWebSiteContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("eLearningAutomotiveWebSiteContext") ?? throw new InvalidOperationException("Connection string 'eLearningAutomotiveWebSiteContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
