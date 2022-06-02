@@ -7,157 +7,110 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using eLearningAutomotiveWebSite.Data;
 using eLearningAutomotiveWebSite.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace eLearningAutomotiveWebSite.Controllers
 {
     public class ContentsController : Controller
     {
-        private readonly eLearningAutomotiveWebSiteContext _context;
+        private readonly eLearningAutomotiveWebSiteContext _contextDb;
 
-        public ContentsController(eLearningAutomotiveWebSiteContext context)
+        public ContentsController(eLearningAutomotiveWebSiteContext contextDb)
         {
-            _context = context;
+            _contextDb = contextDb;
         }
-
-        // GET: Contents
-        public async Task<IActionResult> Index()
+        [Authorize(Roles =="visitor")]
+        public IActionResult Index() // visiteurs uniquement (donc texte)
         {
-              return _context.Content != null ? 
-                          View(await _context.Content.ToListAsync()) :
-                          Problem("Entity set 'eLearningAutomotiveWebSiteContext.Content'  is null.");
+            IEnumerable<Content> Contents = _contextDb.Content;
+            return View(Contents);
         }
-
-        // GET: Contents/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Index()
         {
-            if (id == null || _context.Content == null)
-            {
-                return NotFound();
-            }
-
-            var content = await _context.Content
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (content == null)
-            {
-                return NotFound();
-            }
-
-            return View(content);
+            IEnumerable<Content> Contents = _contextDb.Content;
+            return View(Contents);
         }
-
-        // GET: Contents/Create
-        public IActionResult Create()
+        [HttpGet]
+        public IActionResult Add()
         {
             return View();
         }
+        [HttpGet]
+        public IActionResult Edit(int id) // sélection pour modification d'objet
+        {
+            if (id == 0)
+            {
+                return NotFound();
+            }
+            var Contents = _contextDb.Content.FirstOrDefault(c => c.Id == id);
+            // ou _db.Content.Find(id)
+            if (Contents is null)
+            {
+                return NotFound();
+            }
+            return View(Contents);
+        }
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            if (id == 0)
+            {
+                return NotFound();
+            }
+            var Contents = _contextDb.Content.FirstOrDefault(c => c.Id == id);
+            // ou _db.Content.Find(id)
+            if (Contents is null)
+            {
+                return NotFound();
+            }
+            return View(Contents);
+        }
 
-        // POST: Contents/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Text,Video,CreationDate,ModificationDate,IdCategory")] Content content)
+        public IActionResult Add(Content Contents)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(content);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                _contextDb.Content.Add(Contents);
+                _contextDb.SaveChanges();
+                TempData["message"] = "Tuto ajouté";
             }
-            return View(content);
+            else ModelState.AddModelError("Tuto", "donnée incorrecte");
+
+            return View();
+            // ou redirect vers Index: RedirectToAction("Index");
         }
-
-        // GET: Contents/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Content == null)
-            {
-                return NotFound();
-            }
-
-            var content = await _context.Content.FindAsync(id);
-            if (content == null)
-            {
-                return NotFound();
-            }
-            return View(content);
-        }
-
-        // POST: Contents/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Text,Video,CreationDate,ModificationDate,IdCategory")] Content content)
+        public IActionResult Edit(Content Contents)
         {
-            if (id != content.Id)
+            if (Contents is not null)
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(content);
-                    await _context.SaveChangesAsync();
+                    _contextDb.Content.Update(Contents);
+                    _contextDb.SaveChanges();
+                    TempData["message"] = "Tuto édité";
+                    return RedirectToAction("Index");
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ContentExists(content.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                else return View(Contents);
             }
-            return View(content);
+            return NotFound();
         }
-
-        // GET: Contents/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Content == null)
-            {
-                return NotFound();
-            }
-
-            var content = await _context.Content
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (content == null)
-            {
-                return NotFound();
-            }
-
-            return View(content);
-        }
-
-        // POST: Contents/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult Delete(Content Contents) // suppression d'objet en BDD
         {
-            if (_context.Content == null)
+            if (Contents is not null)
             {
-                return Problem("Entity set 'eLearningAutomotiveWebSiteContext.Content'  is null.");
+                _contextDb.Content.Remove(Contents);
+                _contextDb.SaveChanges();
+                TempData["message"] = "Tuto supprimé";
+                return RedirectToAction("Index");
             }
-            var content = await _context.Content.FindAsync(id);
-            if (content != null)
-            {
-                _context.Content.Remove(content);
-            }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ContentExists(int id)
-        {
-          return (_context.Content?.Any(e => e.Id == id)).GetValueOrDefault();
+            else return View(Contents);
         }
     }
 }
