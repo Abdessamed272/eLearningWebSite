@@ -33,9 +33,14 @@
                        <ul class="navbar-nav ml-auto">
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <li class="nav-item">
+                            <li class="nav-item me-5">
+                                <form method="post" asp-controller="Histories" asp-action="Index">
+                                    <button type="submit" class="btn btn-danger  nav-link text-white  "><strong>Historique</strong></button>
+                                </form>
+                            </li>
+                             <li class="nav-item">
                                 <form method="post" asp-controller="Users" asp-action="logout">
-                                    <button type="submit" class="nav-link text-dark ">Logout @User.Identity.Name</button>
+                                    <button type="submit" class="btn btn-info  nav-link text-white  "><strong>Logout @User.Identity.Name</strong></button>
                                 </form>
                             </li>
                         }
