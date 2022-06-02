@@ -21,14 +21,14 @@
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <div class="checkbox">
-                    <label asp-for="RememberMe">
-                        <input asp-for="RememberMe" />
-                        @Html.DisplayNameFor(m => m.RememberMe)
-                    </label>
+            <div class="form-group"><br />
+                <div class="checkbox d-flex ms-2">
+                         
+                        <input asp-for="RememberMe" class="form-check-input"  />    
+                        <div class="ms-4">@Html.DisplayNameFor(m => m.RememberMe) </div>
+                    
                 </div>
-            </div>
+            </div><br />
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
     </div>
