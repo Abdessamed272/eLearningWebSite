@@ -4,24 +4,25 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using eLearningAutomotiveWebSite.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace eLearningAutomotiveWebSite.Data
 {
-    public class eLearningAutomotiveWebSiteContext : DbContext
+    public class eLearningAutomotiveWebSiteContext : IdentityDbContext
     {
-        public eLearningAutomotiveWebSiteContext (DbContextOptions<eLearningAutomotiveWebSiteContext> options)
+        public eLearningAutomotiveWebSiteContext(DbContextOptions<eLearningAutomotiveWebSiteContext> options)
             : base(options)
         {
         }
 
-        public DbSet<Category> Category { get; set; }
+        public DbSet<eLearningAutomotiveWebSite.Models.Category>? Category { get; set; }
 
-        public DbSet<Content> Content { get; set; }
+        public DbSet<eLearningAutomotiveWebSite.Models.Content>? Content { get; set; }
 
-        public DbSet<History> History { get; set; }
+        public DbSet<eLearningAutomotiveWebSite.Models.History>? History { get; set; }
 
-        public DbSet<Role> Role { get; set; }
+        public DbSet<eLearningAutomotiveWebSite.Models.Role>? Role { get; set; }
 
-        public DbSet<User> User { get; set; }
+        public DbSet<eLearningAutomotiveWebSite.Models.User>? User { get; set; }
     }
 }
