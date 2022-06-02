@@ -1,5 +1,5 @@
 Le projet à réaliser sera le suivant: 
-l'entreprise MANU_AUTO met en place son site de tutoriels pour aider les utilisateur à réparer leur voiture seul. les données sont les suivantes :
+l'entreprise MANU_AUTO met en place son site de tutoriels pour aider les utilisateur à réparer leur voiture seul. Les données sont les suivantes :
 - les membres de l'entreprise doivent avoir la possibilité de manager un tutoriel ( ajouter, modifier, supprimer, voir la liste) 
 - le directeur a le rôle superAdmin et peut décider d'enlever quelqu'un de l'entreprise.
 - l'utilisateur lambda accedera aux vidéos et ecrits des tutoriels 
@@ -24,12 +24,16 @@ Schéma fonctionnel:
 
 ![image](https://user-images.githubusercontent.com/37933499/171390682-9ff22568-88fa-4dde-90ab-8a4fb4ffe463.png)
 
+Convention:
+- nom (attribut, méthodes) en Anglais (sauf au stade de France !!)
+- pascalcase
+- autorisations indiquées explicitement dans le code (utilisation 'using' de Identity et authentification)
+- Identifiants Rôles = visitor/customer/employee/admin
 
 Page d'accueil:
-Le header contient le nom du site, le bouton connect/disconnect, un logo désignant le rôle actuel du User (ex: gris si visiteur, bleu si utilisateur, vert si employé, rouge si admin)
+Le header contient le nom du site, le bouton connect/disconnect, un logo désignant le rôle actuel du User (ex: gris si visiteur, bleu si utilisateur, vert si employé, rouge si admin et incluant le role en texte)
 Le body contient le contenu qui est sélectionné en fonction du rôle (ex: liste de sujets en texte si 'visiteur', liste avec images/vidéos si 'utilisateur') et les différentes vues des tutos en entier. Suivant les rôles, le body accueil également la page admin, le dashboard, l'historique.
 Le footer est à définir (copyright, date ...)
-
 
 
 2) gestion des services
