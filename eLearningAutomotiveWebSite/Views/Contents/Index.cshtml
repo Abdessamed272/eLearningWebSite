@@ -13,14 +13,20 @@
     <thead>
         <tr>
             <th>
+                @Html.DisplayNameFor(model => model.DejaVu)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Title)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Text)
             </th>
-            <th>
+            @if (ViewBag.role = "")
+            {
+                <th>
                 @Html.DisplayNameFor(model => model.Video)
-            </th>
+                </th> 
+            }
             <th>
                 @Html.DisplayNameFor(model => model.CreationDate)
             </th>
@@ -37,14 +43,20 @@
 @foreach (var item in Model) {
         <tr>
             <td>
+                @Html.DisplayFor(modelItem => item.DejaVu?"Vu!":"")
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Text)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Video)
-            </td>
+            @if (ViewBag.role = "")
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => item.Video)
+                </td>   
+            }
             <td>
                 @Html.DisplayFor(modelItem => item.CreationDate)
             </td>
