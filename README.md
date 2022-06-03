@@ -19,16 +19,31 @@ il faudra impérativement :
 - éviter les pages d'erreurs
 - un système de connexion
 
-Schéma fonctionnel:
-1) accueil des 'users'
-
-![image](https://user-images.githubusercontent.com/37933499/171390682-9ff22568-88fa-4dde-90ab-8a4fb4ffe463.png)
-
 Convention:
 - nom (attribut, méthodes) en Anglais (sauf au stade de France !!)
 - pascalcase
 - autorisations indiquées explicitement dans le code (utilisation 'using' de Identity et authentification)
 - Identifiants Rôles = visitor/customer/employee/admin
+
+Gestion des accès:
+- Framework Identity
+
+Base de données:
+- tables en partage sur Azur
+- tables générées par Identity
+  * [dbo].[AspNetUsers] contient les utilisateurs enregistrés
+  * [dbo].[AspNetRoles] contient les définitions des rôles
+  * [dbo].[AspNetUserRoles] contient les attributions de rôle à chaque utilisateur enregistré
+  * [dbo].[Category] liste les noms des catégories
+  * [dbo].[Content] est la liste des tutos (titre, lien, catégorie)
+  * [dbo].[History] liste les tuples associant les contenus visités et leur visiteur
+
+
+Schéma fonctionnel:
+1) accueil des 'users'
+
+![image](https://user-images.githubusercontent.com/37933499/171390682-9ff22568-88fa-4dde-90ab-8a4fb4ffe463.png)
+
 
 Page d'accueil:
 Le header contient le nom du site, le bouton connect/disconnect, un logo désignant le rôle actuel du User (ex: gris si visiteur, bleu si utilisateur, vert si employé, rouge si admin et incluant le role en texte)
