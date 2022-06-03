@@ -37,7 +37,7 @@ namespace eLearningAutomotiveWebSite.Controllers
                 var ContentList = _context.Content.Where(c => idcontents.Contains(c.Id));
                 foreach (Content content in Contents)
                 {
-                    foreach(History history in History)
+                    foreach(History history in History) //modif
                     {
                         if ((history.IdUser == User) && (Content.Id == History.IdContent)) Content.DejaVu = true;
                         else Content.DejaVu = false;
