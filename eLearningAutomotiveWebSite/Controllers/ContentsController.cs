@@ -7,157 +7,131 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using eLearningAutomotiveWebSite.Data;
 using eLearningAutomotiveWebSite.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace eLearningAutomotiveWebSite.Controllers
 {
     public class ContentsController : Controller
     {
-        private readonly eLearningAutomotiveWebSiteContext _context;
+        private readonly eLearningAutomotiveWebSiteContext _contextDb;
+        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<IdentityUser> signInManager;
 
-        public ContentsController(eLearningAutomotiveWebSiteContext context)
+        public ContentsController(eLearningAutomotiveWebSiteContext contextDb,
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager)
         {
-            _context = context;
+            _contextDb = contextDb;
+            this.signInManager = signInManager;
         }
-
-        // GET: Contents
-        public async Task<IActionResult> Index()
+        public IActionResult Index() // visiteurs uniquement (donc texte)
         {
-              return _context.Content != null ? 
-                          View(await _context.Content.ToListAsync()) :
-                          Problem("Entity set 'eLearningAutomotiveWebSiteContext.Content'  is null.");
-        }
-
-        // GET: Contents/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.Content == null)
+            ViewBag.role = ""; // tous sauf visitor
+            IEnumerable<Content> Contents = _contextDb.Content;
+            IEnumerable<History> History = _contextDb.History;
+            if (User.IsInRole("visitor")) ViewBag.role = "v";
+            else
             {
-                return NotFound();
+                var idHistory = Contents.Where(x => x.IdContent == _userManager.GetUserId(HttpContext.User)).Select(y => y.IdContent);
+                var ContentList = _context.Content.Where(c => idcontents.Contains(c.Id));
+                foreach (Content content in Contents)
+                {
+                    foreach(History history in History)
+                    {
+                        if ((history.IdUser == User) && (Content.Id == History.IdContent)) Content.DejaVu = true;
+                        else Content.DejaVu = false;
+                    }
+                }
             }
-
-            var content = await _context.Content
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (content == null)
-            {
-                return NotFound();
-            }
-
-            return View(content);
+            return View(Contents);
         }
-
-        // GET: Contents/Create
+        [HttpGet]
         public IActionResult Create()
         {
+            if (User.IsInRole("employee") || User.IsInRole("superAdmin")) return View();
+            return RedirectToAction("Index");
+        }
+        [HttpGet]
+        public IActionResult Edit(int id) // sélection pour modification d'objet
+        {
+            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
+            if (id == 0)
+            {
+                return NotFound();
+            }
+            var Contents = _contextDb.Content.FirstOrDefault(c => c.Id == id);
+            // ou _db.Content.Find(id)
+            if (Contents is null)
+            {
+                return NotFound();
+            }
+            return View(Contents);
+        }
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
+            if (id == 0)
+            {
+                return NotFound();
+            }
+            var Contents = _contextDb.Content.FirstOrDefault(c => c.Id == id);
+            // ou _db.Content.Find(id)
+            if (Contents is null)
+            {
+                return NotFound();
+            }
+            return View(Contents);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Content Contents)
+        {
+            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
+            if (ModelState.IsValid)
+            {
+                _contextDb.Content.Add(Contents);
+                _contextDb.SaveChanges();
+                TempData["message"] = "Tuto ajouté";
+            }
+            else ModelState.AddModelError("Tuto", "donnée incorrecte");
+
             return View();
+            // ou redirect vers Index: RedirectToAction("Index");
         }
-
-        // POST: Contents/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Text,Video,CreationDate,ModificationDate,IdCategory")] Content content)
+        public IActionResult Edit(Content Contents)
         {
-            if (ModelState.IsValid)
+            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
+            if (Contents is not null)
             {
-                _context.Add(content);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _contextDb.Content.Update(Contents);
+                    _contextDb.SaveChanges();
+                    TempData["message"] = "Tuto édité";
+                    return RedirectToAction("Index");
+                }
+                else return View(Contents);
             }
-            return View(content);
+            return NotFound();
         }
-
-        // GET: Contents/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Content == null)
-            {
-                return NotFound();
-            }
-
-            var content = await _context.Content.FindAsync(id);
-            if (content == null)
-            {
-                return NotFound();
-            }
-            return View(content);
-        }
-
-        // POST: Contents/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Text,Video,CreationDate,ModificationDate,IdCategory")] Content content)
+        public IActionResult Delete(Content Contents) // suppression d'objet en BDD
         {
-            if (id != content.Id)
+            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
+            if (Contents is not null)
             {
-                return NotFound();
+                _contextDb.Content.Remove(Contents);
+                _contextDb.SaveChanges();
+                TempData["message"] = "Tuto supprimé";
+                return RedirectToAction("Index");
             }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(content);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ContentExists(content.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(content);
-        }
-
-        // GET: Contents/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.Content == null)
-            {
-                return NotFound();
-            }
-
-            var content = await _context.Content
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (content == null)
-            {
-                return NotFound();
-            }
-
-            return View(content);
-        }
-
-        // POST: Contents/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.Content == null)
-            {
-                return Problem("Entity set 'eLearningAutomotiveWebSiteContext.Content'  is null.");
-            }
-            var content = await _context.Content.FindAsync(id);
-            if (content != null)
-            {
-                _context.Content.Remove(content);
-            }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ContentExists(int id)
-        {
-          return (_context.Content?.Any(e => e.Id == id)).GetValueOrDefault();
+            else return View(Contents);
         }
     }
 }

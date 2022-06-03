@@ -1,4 +1,5 @@
 ﻿using eLearningAutomotiveWebSite.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -13,11 +14,12 @@ namespace eLearningAutomotiveWebSite.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public IActionResult Index() 
         {
             return View();
         }
 
+        [Authorize(Roles = "SuperAdmin")]
         public IActionResult Privacy()
         {
             return View();
