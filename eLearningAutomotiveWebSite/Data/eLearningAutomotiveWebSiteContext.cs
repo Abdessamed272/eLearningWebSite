@@ -21,8 +21,5 @@ namespace eLearningAutomotiveWebSite.Data
 
         public DbSet<eLearningAutomotiveWebSite.Models.History>? History { get; set; }
 
-        public DbSet<eLearningAutomotiveWebSite.Models.Role>? Role { get; set; }
-
-        public DbSet<eLearningAutomotiveWebSite.Models.User>? User { get; set; }
     }
 }

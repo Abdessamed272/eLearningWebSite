@@ -7,23 +7,41 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using eLearningAutomotiveWebSite.Data;
 using eLearningAutomotiveWebSite.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace eLearningAutomotiveWebSite.Controllers
 {
     public class HistoriesController : Controller
     {
         private readonly eLearningAutomotiveWebSiteContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
-        public HistoriesController(eLearningAutomotiveWebSiteContext context)
+        public HistoriesController(eLearningAutomotiveWebSiteContext context,
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager)
         {
             _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
+        //if (SignInManager.IsSignedIn(User))
+
         // GET: Histories
+        [Authorize]
         public async Task<IActionResult> Index()
         {
-              return _context.History != null ? 
-                          View(await _context.History.ToListAsync()) :
+            var idcontents = _context.History.Where(x => x.IdUser == _userManager.GetUserId(HttpContext.User)).Select(y => y.IdContent);
+            var ContentList = _context.Content.Where(c => idcontents.Contains(c.Id));
+            //ViewBag.contents = ContentList;
+
+            var histories = _context.History.Where(x => x.IdUser == _userManager.GetUserId(HttpContext.User));
+
+
+            return histories != null ? 
+                          View(await histories.ToListAsync()) :
                           Problem("Entity set 'eLearningAutomotiveWebSiteContext.History'  is null.");
         }
 

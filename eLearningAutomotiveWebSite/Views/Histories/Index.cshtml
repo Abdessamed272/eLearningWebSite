@@ -13,14 +13,15 @@
     <thead>
         <tr>
             <th>
+                Content
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.VisitDate)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.IdUser)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdContent)
-            </th>
+
             <th></th>
         </tr>
     </thead>
@@ -28,14 +29,15 @@
 @foreach (var item in Model) {
         <tr>
             <td>
+                @*@ViewBag.contents[0]*@
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.VisitDate)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.IdUser)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdContent)
-            </td>
+
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
