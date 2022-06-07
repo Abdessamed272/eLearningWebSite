@@ -214,22 +214,24 @@ namespace eLearningAutomotiveWebSite.Controllers
             else
             {
                 RegisterUser newModel = new RegisterUser();
-                ViewBag.Email = user.Email;
+                TempData["Email"] = user.Email.ToString();
+
+
                 return RedirectToAction("ResetPassword");
             }
         }
 
         [HttpGet]
-        public async Task<ActionResult> ResetPassword(RegisterUser model)
+        public async Task<ActionResult> ResetPassword()
         {
-                return View(model);
+                return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> ResetPassword(RegisterUser model, int? id)
         {
-            if (model == null)
+            if (model.Email == null)
             {
                 ModelState.AddModelError("EmailEmpty", "");
                 return View(model);

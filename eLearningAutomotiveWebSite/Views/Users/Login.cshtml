@@ -24,10 +24,10 @@
                 <div class="checkbox d-flex ms-2">
                         <input asp-for="RememberMe" class="form-check-input"  />    
                         <div class="ms-4">@Html.DisplayNameFor(m => m.RememberMe) </div>
+                    <a class="ms-2" asp-controller="Users" asp-action="ForgottenPassword"><strong class="text-primary"> Mot de passe oublié !</strong></a>
                 </div>
             </div><br />
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
-        <a asp-controller="Users" asp-action="ForgottenPassword"><strong>Mot de passe oublié!</strong></a>
     </div>
 </div>
