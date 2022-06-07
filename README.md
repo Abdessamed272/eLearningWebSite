@@ -29,7 +29,7 @@ Gestion des accès:
 - Framework Identity
 
 Base de données:
-- tables en partage sur Azur
+- tables en partage sur Azur (tutoautodb.database.windows.net  // login:lamanu)
 - tables générées par Identity
   * [dbo].[AspNetUsers] contient les utilisateurs enregistrés
   * [dbo].[AspNetRoles] contient les définitions des rôles
