@@ -1,31 +1,32 @@
-﻿@model IEnumerable<eLearningAutomotiveWebSite.Models.Content>
+@model IEnumerable<eLearningAutomotiveWebSite.Models.Content>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Bienvenu @ViewBag.Email</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="pt-1 btn btn-primary">Create New</a>
 </p>
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.DejaVu)
-            </th>
+            @if (ViewBag.Role != "visitor")
+            {
+                <th>Vu?</th>
+            }
             <th>
                 @Html.DisplayNameFor(model => model.Title)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Text)
             </th>
-            @if (ViewBag.role = "")
+            @if (ViewBag.Role != "visitor")
             {
                 <th>
-                @Html.DisplayNameFor(model => model.Video)
-                </th> 
+                    @Html.DisplayNameFor(model => model.Video)
+                </th>
             }
             <th>
                 @Html.DisplayNameFor(model => model.CreationDate)
@@ -36,42 +37,57 @@
             <th>
                 @Html.DisplayNameFor(model => model.IdCategory)
             </th>
-            <th></th>
+            @if (ViewBag.Role != "visitor")
+            {
+                <th>gérer</th>
+            }
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DejaVu?"Vu":"")
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Text)
-            </td>
-            @if (ViewBag.role = "")
-            {
+        @foreach (var item in Model)
+        {
+            <tr>
+                @if (ViewBag.Role != "visitor")
+                {
+                    @if (item.DejaVu)
+                    {
+                        <td>Vu!</td>
+                    }
+                    else
+                    {
+                        <td>New!</td>
+                    }
+                }
                 <td>
-                    @Html.DisplayFor(modelItem => item.Video)
-                </td>   
-            }
-            <td>
-                @Html.DisplayFor(modelItem => item.CreationDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ModificationDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdCategory)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Text)
+                </td>
+                @if (ViewBag.Role != "visitor")
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Video)
+                    </td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreationDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ModificationDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IdCategory)
+                </td>
+                @if (ViewBag.Role != "visitor")
+                {
+                    <td>
+                        <a class="btn btn-info" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <a class="btn btn-warning" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                        <a class="btn btn-secondary" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                }
+            </tr>
+        }
     </tbody>
 </table>

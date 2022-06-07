@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,43 +17,48 @@ namespace eLearningAutomotiveWebSite.Controllers
         private readonly eLearningAutomotiveWebSiteContext _contextDb;
         private readonly UserManager<IdentityUser> userManager;
         private readonly SignInManager<IdentityUser> signInManager;
+        private string _userId = "";
+        private string _userRole = "visitor";
+        private string _userEmail = "dude";
 
         public ContentsController(eLearningAutomotiveWebSiteContext contextDb,
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager)
         {
             _contextDb = contextDb;
-            this.signInManager = signInManager;
+            this.signInManager = signInManager; // à supprimer ?
+            this.userManager = userManager;
+            if (User is not null)
+            {
+                _userId = userManager.GetUserId(User);
+                _userEmail = userManager.GetUserName(User);
+            }
         }
-
-        public IActionResult Index() // visiteurs uniquement (donc texte)
+        public IActionResult Index()
         {
-            ViewBag.role = ""; // tous sauf visitor
             IEnumerable<Content> Contents = _contextDb.Content;
             IEnumerable<History> History = _contextDb.History;
-            if (User.IsInRole("visitor")) ViewBag.role = "v";
-            else
+            _userRole = User.IsInRole("cutomer") ? "customer" : User.IsInRole("employee") ? "employee" : User.IsInRole("superAdmin") ? "superAdmin" : "visitor";
+            ViewBag.Role = _userRole;
+            ViewBag.Email = _userEmail;
+            var idsHistoryUser = History.Where(x => x.IdUser == _userId).ToList();
+            foreach (Content content in Contents) // avec limitation du nombre si qté importante de contenu
             {
-                var idHistory = Contents.Where(x => x.IdContent == _userManager.GetUserId(HttpContext.User)).Select(y => y.IdContent);
-                var ContentList = _context.Content.Where(c => idcontents.Contains(c.Id));
-                foreach (Content content in Contents)
-                {
-                    foreach(History history in History)
-                    {
-                        if ((history.IdUser == User) && (Content.Id == History.IdContent)) Content.DejaVu = true;
-                        else Content.DejaVu = false;
-                    }
-                }
+                if (idsHistoryUser.Count() == 0) content.DejaVu = false;
+                else if (idsHistoryUser.Where(x => x.IdContent == content.Id).Count() > 0) content.DejaVu = true;
+                else content.DejaVu = false;
             }
             return View(Contents);
         }
         [HttpGet]
+        [Authorize(Roles = "employee")]
         public IActionResult Create()
         {
             if (User.IsInRole("employee") || User.IsInRole("superAdmin")) return View();
             return RedirectToAction("Index");
         }
         [HttpGet]
+        [Authorize(Roles = "employee")]
         public IActionResult Edit(int id) // sélection pour modification d'objet
         {
             if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
@@ -70,6 +75,7 @@ namespace eLearningAutomotiveWebSite.Controllers
             return View(Contents);
         }
         [HttpGet]
+        [Authorize(Roles = "employee")]
         public IActionResult Delete(int id)
         {
             if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
@@ -88,6 +94,7 @@ namespace eLearningAutomotiveWebSite.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "employee")]
         public IActionResult Create(Content Contents)
         {
             if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
@@ -104,6 +111,7 @@ namespace eLearningAutomotiveWebSite.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "employee")]
         public IActionResult Edit(Content Contents)
         {
             if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
@@ -122,6 +130,7 @@ namespace eLearningAutomotiveWebSite.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "employee")]
         public IActionResult Delete(Content Contents) // suppression d'objet en BDD
         {
             if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
