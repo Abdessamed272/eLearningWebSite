@@ -15,26 +15,48 @@ namespace eLearningAutomotiveWebSite.Controllers
     public class ContentsController : Controller
     {
         private readonly eLearningAutomotiveWebSiteContext _contextDb;
+        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<IdentityUser> signInManager;
 
-        public ContentsController(eLearningAutomotiveWebSiteContext contextDb)
+        public ContentsController(eLearningAutomotiveWebSiteContext contextDb,
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager)
         {
             _contextDb = contextDb;
-        }
-        [Authorize(Roles ="visitor")]
-        public IActionResult Index() // visiteurs uniquement (donc texte)
-        {
-            IEnumerable<Content> Contents = _contextDb.Content;
-            return View(Contents);
+            this.signInManager = signInManager;
         }
 
-        [HttpGet]
-        public IActionResult Add()
+        public IActionResult Index() // visiteurs uniquement (donc texte)
         {
-            return View();
+            ViewBag.role = ""; // tous sauf visitor
+            IEnumerable<Content> Contents = _contextDb.Content;
+            IEnumerable<History> History = _contextDb.History;
+            if (User.IsInRole("visitor")) ViewBag.role = "v";
+            else
+            {
+                var idHistory = Contents.Where(x => x.IdContent == _userManager.GetUserId(HttpContext.User)).Select(y => y.IdContent);
+                var ContentList = _context.Content.Where(c => idcontents.Contains(c.Id));
+                foreach (Content content in Contents)
+                {
+                    foreach(History history in History)
+                    {
+                        if ((history.IdUser == User) && (Content.Id == History.IdContent)) Content.DejaVu = true;
+                        else Content.DejaVu = false;
+                    }
+                }
+            }
+            return View(Contents);
+        }
+        [HttpGet]
+        public IActionResult Create()
+        {
+            if (User.IsInRole("employee") || User.IsInRole("superAdmin")) return View();
+            return RedirectToAction("Index");
         }
         [HttpGet]
         public IActionResult Edit(int id) // sélection pour modification d'objet
         {
+            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
             if (id == 0)
             {
                 return NotFound();
@@ -50,6 +72,7 @@ namespace eLearningAutomotiveWebSite.Controllers
         [HttpGet]
         public IActionResult Delete(int id)
         {
+            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
             if (id == 0)
             {
                 return NotFound();
@@ -65,8 +88,9 @@ namespace eLearningAutomotiveWebSite.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Add(Content Contents)
+        public IActionResult Create(Content Contents)
         {
+            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
             if (ModelState.IsValid)
             {
                 _contextDb.Content.Add(Contents);
@@ -82,6 +106,7 @@ namespace eLearningAutomotiveWebSite.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Content Contents)
         {
+            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
             if (Contents is not null)
             {
                 if (ModelState.IsValid)
@@ -99,6 +124,7 @@ namespace eLearningAutomotiveWebSite.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(Content Contents) // suppression d'objet en BDD
         {
+            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
             if (Contents is not null)
             {
                 _contextDb.Content.Remove(Contents);
