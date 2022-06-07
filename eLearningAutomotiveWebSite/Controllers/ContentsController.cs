@@ -20,17 +20,13 @@ namespace eLearningAutomotiveWebSite.Controllers
         {
             _contextDb = contextDb;
         }
-        [Authorize(Roles =="visitor")]
+        [Authorize(Roles ="visitor")]
         public IActionResult Index() // visiteurs uniquement (donc texte)
         {
             IEnumerable<Content> Contents = _contextDb.Content;
             return View(Contents);
         }
-        public IActionResult Index()
-        {
-            IEnumerable<Content> Contents = _contextDb.Content;
-            return View(Contents);
-        }
+
         [HttpGet]
         public IActionResult Add()
         {

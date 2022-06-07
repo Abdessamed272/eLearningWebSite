@@ -35,7 +35,7 @@ namespace eLearningAutomotiveWebSite.Controllers
         {
             var idcontents = _context.History.Where(x => x.IdUser == _userManager.GetUserId(HttpContext.User)).Select(y => y.IdContent);
             var ContentList = _context.Content.Where(c => idcontents.Contains(c.Id));
-            //ViewBag.contents = ContentList;
+            ViewBag.contents = ContentList.ToList();
 
             var histories = _context.History.Where(x => x.IdUser == _userManager.GetUserId(HttpContext.User));
 
