@@ -1,47 +1,43 @@
 ﻿@model IEnumerable<eLearningAutomotiveWebSite.Models.History>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Historique de consultation";
 }
 
-<h1>Index</h1>
+<h1>Historique de consultation</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                Content
+                Article visité
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.VisitDate)
             </th>
-            <th>
+@*            <th>
                 @Html.DisplayNameFor(model => model.IdUser)
-            </th>
+            </th>*@
 
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+
+@foreach (var (item, i) in Model.Select((item, i)=> (item, i))) {
         <tr>
             <td>
-                @*@ViewBag.contents[0]*@
-            </td>
+                @ViewBag.contents[i].Title
+           </td>
             <td>
                 @Html.DisplayFor(modelItem => item.VisitDate)
             </td>
-            <td>
+@*            <td>
                 @Html.DisplayFor(modelItem => item.IdUser)
             </td>
-
+*@
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a  class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Supprimer</a>
             </td>
         </tr>
 }
