@@ -25,6 +25,7 @@ namespace eLearningAutomotiveWebSite.Controllers
             _contextDb = contextDb;
             this.signInManager = signInManager;
         }
+
         public IActionResult Index() // visiteurs uniquement (donc texte)
         {
             ViewBag.role = ""; // tous sauf visitor

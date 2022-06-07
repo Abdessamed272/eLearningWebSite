@@ -13,14 +13,16 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     options.Password.RequiredUniqueChars = 1;
     options.Password.RequireNonAlphanumeric = false;
 })
-    .AddEntityFrameworkStores<eLearningAutomotiveWebSiteContext>();
+    .AddEntityFrameworkStores<eLearningAutomotiveWebSiteContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+    {
+});
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    //Location for your Custom Access Denied Page
-    //options.AccessDeniedPath = "Users/AccessDenied";
-
-    //Location for your Custom Login Page
+    options.AccessDeniedPath = new PathString("/Home/AccessDenied");
     options.LoginPath = "/Users/Login";
 });
 // Add services to the container.

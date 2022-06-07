@@ -5,6 +5,7 @@ using eLearningAutomotiveWebSite.Data;
 using eLearningAutomotiveWebSite.Models;
 using Microsoft.AspNetCore.Identity;
 
+
 namespace eLearningAutomotiveWebSite.Controllers
 {
     public class UsersController : Controller
@@ -12,16 +13,19 @@ namespace eLearningAutomotiveWebSite.Controllers
         private readonly eLearningAutomotiveWebSiteContext _context;
 
 
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private IPasswordHasher<IdentityUser> _passwordHasher;
 
         public UsersController(eLearningAutomotiveWebSiteContext context,
             UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            SignInManager<IdentityUser> signInManager,
+            IPasswordHasher<IdentityUser> passwordHasher)
         {
             _context = context;
-            this.userManager = userManager;
-            this.signInManager = signInManager;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _passwordHasher = passwordHasher;
         }
 
 
@@ -45,12 +49,25 @@ namespace eLearningAutomotiveWebSite.Controllers
                     Email = model.Email
                 };
 
-                var result = await userManager.CreateAsync(user, model.Password);
+                var result = await _userManager.CreateAsync(user, model.Password);
+                string HostEmail = model.Email.Split('@')[1].Split('.')[0];
 
-            
                 if (result.Succeeded)
                 {
-                    await signInManager.SignInAsync(user, isPersistent: false);
+                    if(HostEmail == "lamanu")
+                    {
+
+                    var roleresult = await _userManager.AddToRoleAsync(user, "Employee");
+
+                        if (roleresult.Succeeded)
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                        }
+ 
+                    }else
+                    { 
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                    }
                     return RedirectToAction("index", "home");
                 }
 
@@ -61,7 +78,6 @@ namespace eLearningAutomotiveWebSite.Controllers
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
-
             return View(model);
         }
 
@@ -70,7 +86,7 @@ namespace eLearningAutomotiveWebSite.Controllers
 
         public IActionResult Logout()
         {
-             signInManager.SignOutAsync();
+            _signInManager.SignOutAsync();
             return RedirectToAction("index", "home");
         }
 
@@ -89,7 +105,7 @@ namespace eLearningAutomotiveWebSite.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await signInManager.PasswordSignInAsync(
+                var result = await _signInManager.PasswordSignInAsync(
                     model.Email, model.Password, model.RememberMe, false);
 
                 if (result.Succeeded)
@@ -110,146 +126,127 @@ namespace eLearningAutomotiveWebSite.Controllers
             return View(model);
         }
 
-
-        // GET: Users
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return _context.User != null ?
-                        View(await _context.User.ToListAsync()) :
-                        Problem("Entity set 'eLearningAutomotiveWebSiteContext.User'  is null.");
+            return View(_userManager.Users);
         }
 
-        // GET: Users/Details/5
-        public async Task<IActionResult> Details(int? id)
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(string id)
         {
-            if (id == null || _context.User == null)
+            var user = await _userManager.FindByIdAsync(id);
+            if (user != null)
             {
-                return NotFound();
+                IdentityResult result = await _userManager.DeleteAsync(user);
+                if (result.Succeeded)
+                    return RedirectToAction("Index");
             }
-
-            var user = await _context.User
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return View(user);
-        }
-
-        // GET: Users/Create
-        public IActionResult Create()
-        {
             return View();
         }
 
-        // POST: Users/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Mail,Password,IdRole")] User user)
+
+        public async Task<IActionResult> UpdateProfile()
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(user);
-        }
+            var user = await _userManager.GetUserAsync(HttpContext.User);
 
-        // GET: Users/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.User == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return View(user);
-        }
-
-        // POST: Users/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Mail,Password,IdRole")] User user)
-        {
-            if (id != user.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(user);
-        }
-
-        // GET: Users/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null || _context.User == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.User
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return View(user);
-        }
-
-        // POST: Users/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.User == null)
-            {
-                return Problem("Entity set 'eLearningAutomotiveWebSiteContext.User'  is null.");
-            }
-            var user = await _context.User.FindAsync(id);
             if (user != null)
             {
-                _context.User.Remove(user);
+                RegisterUser model = new RegisterUser();
+                model.Email = user.Email;
+
+                return View(model);
+            }
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProfile(RegisterUser model)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+
+            user.PasswordHash = _passwordHasher.HashPassword(user, model.Password);
+
+
+            IdentityResult result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index", "Home");
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            model.Email = user.Email;
+            return View(model);
         }
 
-        private bool UserExists(int id)
+
+        public async Task<IActionResult> ForgottenPassword()
         {
-            return (_context.User?.Any(e => e.Id == id)).GetValueOrDefault();
+            //var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            //if (user != null)
+            //{
+            //    RegisterUser model = new RegisterUser();
+            //    model.Email = user.Email;
+
+            //    return View(model);
+            //}
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ForgottenPassword(RegisterUser model)
+        {
+            if (model == null)
+            {
+                ModelState.AddModelError("EmailEmpty", "Email ne doit pas être vide");
+                return View(model);
+            }
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError("EmailNotFound", "@ Email n'existe pas");
+                return View(model);
+            }
+            else
+            {
+                RegisterUser newModel = new RegisterUser();
+                TempData["Email"] = user.Email.ToString();
+
+
+                return RedirectToAction("ResetPassword");
+            }
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> ResetPassword()
+        {
+                return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ResetPassword(RegisterUser model, int? id)
+        {
+            if (model.Email == null)
+            {
+                ModelState.AddModelError("EmailEmpty", "");
+                return View(model);
+            }
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, code, model.Password);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            return View(model);
         }
     }
+
 }
+

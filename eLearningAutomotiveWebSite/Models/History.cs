@@ -9,9 +9,9 @@ namespace eLearningAutomotiveWebSite.Models
         //testtests
         public DateTime VisitDate { get; set; }
 
-
         [Required]
-        public int IdUser { get; set; }
+        [MaxLength(450)]
+        public string IdUser { get; set; }
 
         [Required]
         public int IdContent { get; set; }

@@ -1,4 +1,5 @@
 ﻿ @inject SignInManager<IdentityUser> SignInManager;
+  @inject UserManager<IdentityUser> UserManager;
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,11 +8,12 @@
     <title>@ViewData["Title"] E-Learning </title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+     <link rel="stylesheet" href="~/css/bootstrap.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/eLearningAutomotiveWebSite.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-warning border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">E-Learning</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -32,14 +34,56 @@
                        <ul class="navbar-nav ml-auto">
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <li class="nav-item">
-                                <form method="post" asp-controller="Users" asp-action="logout">
-                                    <button type="submit" class="nav-link text-dark ">Logout @User.Identity.Name</button>
+
+                            @if (User.IsInRole("SuperAdmin"))
+                            {
+                                <li class="nav-item me-2">
+                                    <div class="nav-link">
+                                        Vous êtes connecté en tant qu'Administrateur!
+                                    </div>
+                                </li>
+                                <li class="nav-item me-5">
+                                    <form method="post" asp-controller="Users" asp-action="Index">
+                                        <button type="submit" class="btn btn-primary nav-link text-white  "><strong>Liste des employés</strong></button>
+                                    </form>
+                                </li>
+                            }else if (User.IsInRole("Employee"))
+                            {
+                                <li class="nav-item me-2">
+                                    <div class="nav-link">
+                                        Vous êtes connecté en tant qu'employé!
+                                    </div>
+                                </li>
+                            }else
+                            {
+                                <li class="nav-item me-2">
+                                    <div class="nav-link">
+                                        Hello Student !
+                                    </div>
+                                </li>
+                            }
+                            <li class="nav-item me-5">
+                                <form method="post" asp-controller="Histories" asp-action="Index">
+                                    <button type="submit" class="btn btn-danger  nav-link text-white  "><strong>Historique</strong></button>
                                 </form>
+                            </li>
+                             <li class="nav-item me-5">
+                                <form method="post" asp-controller="Users" asp-action="logout">
+                                    <button type="submit" class="btn btn-info  nav-link text-white  "><strong>Logout @User.Identity.Name</strong></button>
+                                </form>
+                            </li>
+                            <li class="nav-item me-3">
+                                <a class="btn btn-primary nav-link text-white  " asp-controller="Users" asp-action="UpdateProfile"><strong>Profile</strong>
+                                </a>
                             </li>
                         }
                         else
                         {
+                            <li class="nav-item me-2">
+                                <div class="nav-link">
+                                    Hello Visitor !
+                                </div>
+                            </li>
                             <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Register">Créer un compte</a>
 
