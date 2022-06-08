@@ -19,7 +19,7 @@ namespace eLearningAutomotiveWebSite.Controllers
             return View();
         }
 
-        [Authorize(Roles = "SuperAdmin")]
+        [Authorize(Roles = "superadmin")]
         public IActionResult Privacy()
         {
             return View();
