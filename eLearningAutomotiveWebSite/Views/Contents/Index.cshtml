@@ -54,18 +54,22 @@
                 {
                     @if (item.DejaVu)
                     {
-                        <td>Vu!</td>
+                        <td><div class="btn btn-success">Vu!</div></td>
                     }
                     else
                     {
-                        <td>New!</td>
+                        <td><div class="btn btn-secondary">New!</div></td>
                     }
                 }
                 <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">
                     @Html.DisplayFor(modelItem => item.Title)
+                    </a>
                 </td>
                 <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">
                     @Html.DisplayFor(modelItem => item.Text)
+                    </a>
                 </td>
                 @if (ViewBag.Role != "visitor")
                 {
