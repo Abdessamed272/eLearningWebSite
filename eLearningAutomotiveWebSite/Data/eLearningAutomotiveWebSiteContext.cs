@@ -15,11 +15,11 @@ namespace eLearningAutomotiveWebSite.Data
         {
         }
 
-        public DbSet<eLearningAutomotiveWebSite.Models.Category>? Category { get; set; }
+        public DbSet<eLearningAutomotiveWebSite.Models.Category> Category { get; set; }
 
-        public DbSet<eLearningAutomotiveWebSite.Models.Content>? Content { get; set; }
+        public DbSet<eLearningAutomotiveWebSite.Models.Content> Content { get; set; }
 
-        public DbSet<eLearningAutomotiveWebSite.Models.History>? History { get; set; }
+        public DbSet<eLearningAutomotiveWebSite.Models.History> History { get; set; }
 
     }
 }

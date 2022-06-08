@@ -4,9 +4,8 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>Edit Content</h1>
 
-<h4>Content</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -29,19 +28,18 @@
                 <span asp-validation-for="Video" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CreationDate" class="control-label"></label>
-                <input asp-for="CreationDate" class="form-control" />
-                <span asp-validation-for="CreationDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="ModificationDate" class="control-label"></label>
                 <input asp-for="ModificationDate" class="form-control" />
                 <span asp-validation-for="ModificationDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="IdCategory" class="control-label"></label>
-                <input asp-for="IdCategory" class="form-control" />
-                <span asp-validation-for="IdCategory" class="text-danger"></span>
+                <label asp-for="IdCategory" class="form-label">Catégories</label>
+                <select class="form-control" asp-for="IdCategory">
+                    <option class="form-control" value="1">carrosserie</option>
+                    <option class="form-control" value="2">moteur</option>
+                    <option class="form-control" value="3">mécanique</option>
+                    <option class="form-control" value="4">entretien</option>
+                </select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
