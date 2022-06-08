@@ -4,15 +4,18 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Bienvenu @ViewBag.Email</h1>
+<h1>Bienvenue @ViewBag.Email / Les tutos de l'auto</h1>
 
 <p>
-    <a asp-action="Create" class="pt-1 btn btn-primary">Create New</a>
+    @if (ViewBag.Role == "employee")
+    {
+        <a asp-action="Create" class="pt-1 btn btn-primary">Create New</a>
+    }
 </p>
 <table class="table">
     <thead>
         <tr>
-            @if (ViewBag.Role != "visitor")
+            @if (ViewBag.Role == "employee")
             {
                 <th>Vu?</th>
             }
@@ -35,9 +38,9 @@
                 @Html.DisplayNameFor(model => model.ModificationDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IdCategory)
+                Categorie
             </th>
-            @if (ViewBag.Role != "visitor")
+            @if (ViewBag.Role == "employee")
             {
                 <th>gérer</th>
             }
@@ -47,7 +50,7 @@
         @foreach (var item in Model)
         {
             <tr>
-                @if (ViewBag.Role != "visitor")
+                @if (ViewBag.Role == "employee")
                 {
                     @if (item.DejaVu)
                     {
@@ -77,9 +80,9 @@
                     @Html.DisplayFor(modelItem => item.ModificationDate)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.IdCategory)
+                    @ViewBag.Categories[item.IdCategory]
                 </td>
-                @if (ViewBag.Role != "visitor")
+                @if (ViewBag.Role == "employee")
                 {
                     <td>
                         <a class="btn btn-info" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
