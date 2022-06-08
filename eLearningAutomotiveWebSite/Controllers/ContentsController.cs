@@ -20,8 +20,9 @@ namespace eLearningAutomotiveWebSite.Controllers
         private string _userId = "";
         private string _userRole = "visitor";
         private string _userEmail = "dude";
+        private string[] Categories = { "NA","carrosserie", "moteur", "mécanique", "entretien" };
 
-        public ContentsController(eLearningAutomotiveWebSiteContext contextDb,
+    public ContentsController(eLearningAutomotiveWebSiteContext contextDb,
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager)
         {
@@ -34,13 +35,15 @@ namespace eLearningAutomotiveWebSite.Controllers
                 _userEmail = userManager.GetUserName(User);
             }
         }
+
         public IActionResult Index()
         {
             IEnumerable<Content> Contents = _contextDb.Content;
             IEnumerable<History> History = _contextDb.History;
-            _userRole = User.IsInRole("cutomer") ? "customer" : User.IsInRole("employee") ? "employee" : User.IsInRole("superAdmin") ? "superAdmin" : "visitor";
+            _userRole = User.IsInRole("customer") ? "customer" : User.IsInRole("employee") ? "employee" : User.IsInRole("superadmin") ? "superadmin" : "visitor";
             ViewBag.Role = _userRole;
             ViewBag.Email = _userEmail;
+            ViewBag.Categories = Categories;
             var idsHistoryUser = History.Where(x => x.IdUser == _userId).ToList();
             foreach (Content content in Contents) // avec limitation du nombre si qté importante de contenu
             {
@@ -54,7 +57,7 @@ namespace eLearningAutomotiveWebSite.Controllers
         [Authorize(Roles = "employee")]
         public IActionResult Create()
         {
-            if (User.IsInRole("employee") || User.IsInRole("superAdmin")) return View();
+            if (User.IsInRole("employee")) return View(); // option: || User.IsInRole("superadmin")
             return RedirectToAction("Index");
         }
         [HttpGet]
