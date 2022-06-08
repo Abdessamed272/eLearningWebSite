@@ -17,6 +17,7 @@ namespace eLearningAutomotiveWebSite.Models
         public bool DejaVu { get; set; }
 
         [Required]
+        //[Display(Name = "xxx")] pour donner un exemple de redéfinition du nom lu par DisplayNameFor
         public DateTime CreationDate { get; set; }
 
         public DateTime ModificationDate { get; set; }

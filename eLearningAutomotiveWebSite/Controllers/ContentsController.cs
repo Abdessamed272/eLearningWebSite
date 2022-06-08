@@ -64,7 +64,7 @@ namespace eLearningAutomotiveWebSite.Controllers
         [Authorize(Roles = "employee")]
         public IActionResult Edit(int id) // sélection pour modification d'objet
         {
-            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
+            //if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
             if (id == 0)
             {
                 return NotFound();
@@ -78,10 +78,36 @@ namespace eLearningAutomotiveWebSite.Controllers
             return View(Contents);
         }
         [HttpGet]
+        public IActionResult Details(int id) // sélection pour modification d'objet
+        {
+            if (id == 0)
+            {
+                return NotFound();
+            }
+            var Content = _contextDb.Content.FirstOrDefault(c => c.Id == id);
+            // ou _db.Content.Find(id)
+            if (Content is null)
+            {
+                return NotFound();
+            }
+            ViewBag.Categories = Categories;
+            _userRole = User.IsInRole("customer") ? "customer" : User.IsInRole("employee") ? "employee" : User.IsInRole("superadmin") ? "superadmin" : "visitor";
+            ViewBag.Role = _userRole;
+            if (_userRole == "visitor") return View(Content);
+            History HistoryCard = new();
+            HistoryCard.VisitDate = DateTime.Now;
+            HistoryCard.IdUser = _userId;
+            HistoryCard.IdContent = Content.Id;
+            _contextDb.History.Add(HistoryCard);
+            _contextDb.SaveChanges();
+            TempData["message"] = "Tuto/user vu";
+            return View(Content);
+        }
+        [HttpGet]
         [Authorize(Roles = "employee")]
         public IActionResult Delete(int id)
         {
-            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
+            //if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
             if (id == 0)
             {
                 return NotFound();
@@ -100,7 +126,7 @@ namespace eLearningAutomotiveWebSite.Controllers
         [Authorize(Roles = "employee")]
         public IActionResult Create(Content Contents)
         {
-            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
+            //if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
             if (ModelState.IsValid)
             {
                 _contextDb.Content.Add(Contents);
@@ -117,7 +143,7 @@ namespace eLearningAutomotiveWebSite.Controllers
         [Authorize(Roles = "employee")]
         public IActionResult Edit(Content Contents)
         {
-            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
+            //if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
             if (Contents is not null)
             {
                 if (ModelState.IsValid)
@@ -136,9 +162,10 @@ namespace eLearningAutomotiveWebSite.Controllers
         [Authorize(Roles = "employee")]
         public IActionResult Delete(Content Contents) // suppression d'objet en BDD
         {
-            if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
+            //if (User.IsInRole("visitor") || User.IsInRole("customer")) return RedirectToAction("Index");
             if (Contents is not null)
             {
+                ViewBag.Categories = Categories;
                 _contextDb.Content.Remove(Contents);
                 _contextDb.SaveChanges();
                 TempData["message"] = "Tuto supprimé";
